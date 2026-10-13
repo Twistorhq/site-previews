@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<!-- Prepared by Twistor Holdings LLC -->
+<!-- GitHub Pages serves this file for ANY unknown path on the site.
+     Deep links into the lbt-os preview SPA (e.g. /site-previews/tw-415/lbtos/app)
+     would otherwise 404 because the client-side router never boots.
+     This router fetches the app's own shell and swaps it in WITHOUT changing
+     the URL, so React Router sees the real deep-link path and routes to it.
+     Asset URLs in the shell are absolute, so they resolve correctly. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loading…</title>
+    <script>
+      (function () {
+        var path = window.location.pathname;
+        // Map of SPA base paths to their app-shell location.
+        var apps = {
+          '/site-previews/tw-415/lbtos/': '/site-previews/tw-415/lbtos/index.html',
+        };
+        var shell = null;
+        for (var base in apps) {
+          if (Object.prototype.hasOwnProperty.call(apps, base) && path.indexOf(base) === 0) {
+            shell = apps[base];
+            break;
+          }
+        }
+        if (!shell) return; // Not an SPA path — leave the 404 page as-is.
+        fetch(shell, { credentials: 'same-origin' })
+          .then(function (r) {
+            if (!r.ok) throw new Error('shell fetch failed: ' + r.status);
+            return r.text();
+          })
+          .then(function (html) {
+            document.open();
+            document.write(html);
+            document.close();
+          })
+          .catch(function () {
+            document.body.innerHTML = '<p>Could not load the app. Try the <a href="/site-previews/tw-415/lbtos/">preview home</a>.</p>';
+          });
+      })();
+    </script>
+  </head>
+  <body>
+    <p>Not found.</p>
+  </body>
+</html>
